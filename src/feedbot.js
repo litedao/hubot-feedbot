@@ -7,7 +7,9 @@
 // Commands:
 //   hubot about - bot info
 //   hubot balance <address> - show balance of <address> in ETH
-//   hubot status - <what the respond trigger does>
+//   hubot price - show current medianizer price
+//   hubot status - display status of all feeds
+//   hubot toggle - turn price change alerts on/off
 //
 // Notes:
 //   <optional notes required for the script>
@@ -68,18 +70,19 @@ var c1 = web3.eth.contract(abiCache);
 
 var count = 0;
 
+var ECHO_PRICE = false;
+
 module.exports = (robot) => {
   var interval = null;
 
   med.LogNote({}, (e, r) => {
-    if (!e) {
+    if (!e && ECHO_PRICE) {
       med.read((e, r) => {
         if (!e) {
           var val = web3.fromWei(r);
           robot.messageRoom('feeds-test', val);
         }
       });
-      console.log(r);
     }
   });
 
@@ -94,14 +97,13 @@ module.exports = (robot) => {
   //   });
   // }, 60000);
 
-  robot.respond(/cache/, res => {
+  robot.respond(/status/, res => {
     data.forEach(x => {
       var c = c1.at(x.cache);
         c.peek((e, r) => {
           if (!e) {
             var val = web3.fromWei(r[0]);
-            res.reply(val);
-            res.reply(r[1]);
+            res.send(`Feed ${x.cache} Owner ${x.user} Price ${val} ${r[1] ? 'Valid' : 'INVALID'}`);
           } else {
             res.reply(e);
           }
@@ -115,7 +117,7 @@ module.exports = (robot) => {
     // robot.messageRoom(user, 'zomg');
   });
 
-  robot.respond(/med/, res => {
+  robot.respond(/price/, res => {
     med.read((e, r) => {
       if (!e) {
         var val = web3.fromWei(r);
@@ -131,13 +133,13 @@ module.exports = (robot) => {
   });
 
   robot.respond(/about/, res => {
-    res.send("Coming soon...");
+    res.send("I read feeds.\nSend suggestions to `mariano.conti`\nhttps://github.com/nanexcool/hubot-feedbot");
   });
 
-  robot.respond(/status/, res => {
-    count++;
-    res.send(`${res.random(random)}. (${count})`);
-  });
+  // robot.respond(/status/, res => {
+  //   count++;
+  //   res.send(`${res.random(random)}. (${count})`);
+  // });
 
   robot.respond(/balance(?:\s+(.*))?$/i, res => {
     if (res.match[1]) {
@@ -146,6 +148,12 @@ module.exports = (robot) => {
     } else {
       res.reply('HINT: try `feedbot balance <address>`');
     }
+  });
+
+  robot.respond(/toggle/i, res => {
+    ECHO_PRICE = !ECHO_PRICE;
+    const out = ECHO_PRICE ? 'on' : 'off';
+    res.reply(`Price alerts are now ${out}.`);
   });
 }
 
