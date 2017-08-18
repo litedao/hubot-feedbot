@@ -73,6 +73,23 @@ var count = 0;
 var ECHO_PRICE = false;
 
 module.exports = (robot) => {
+
+  // robot.respond(/set (\w+) (.*)/i, res => {
+  //   const key = res.match[1].trim().toLowerCase();
+  //   const value = res.match[2].trim().toLowerCase();
+  //   robot.brain.set(key, value);
+  // });
+
+  // robot.respond(/get (\w+)/i, res => {
+  //   const key = res.match[1].trim().toLowerCase();
+  //   res.reply(robot.brain.get(key) || 'ERROR! No value for that key.');
+  // });
+
+  robot.respond(/who/i, res => {
+    console.log(res.message);
+    console.log(robot.name);
+  });
+
   var interval = null;
 
   med.LogNote({}, (e, r) => {
