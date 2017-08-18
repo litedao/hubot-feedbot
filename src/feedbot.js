@@ -42,7 +42,7 @@ const data = [
     cache: '0x16928e240Ca91DC09053B20d2b909cc29F31bf54',
     owner: '0x326bde1246c0e42d9983868665b961bca8e647f1',
     user: 'james',
-   },
+  },
   {
     cache: '0x975d88b5998b73b3ecf69a5ca6b196dafdb95530',
     owner: '0xb8bb9ef0a74651d141e798856a2575e7e577e9d7',
@@ -56,17 +56,16 @@ const data = [
 ];
 
 var Web3 = require('web3');
-var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+var web3 = new Web3('ws://localhost:8546');
 
 var abiCache = [{ "constant": false, "inputs": [{ "name": "owner_", "type": "address" }], "name": "setOwner", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "wut", "type": "bytes32" }], "name": "poke", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "read", "outputs": [{ "name": "", "type": "bytes32" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "peek", "outputs": [{ "name": "", "type": "bytes32" }, { "name": "", "type": "bool" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "authority_", "type": "address" }], "name": "setAuthority", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "wut", "type": "bytes32" }, { "name": "Zzz", "type": "uint128" }], "name": "prod", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "zzz", "outputs": [{ "name": "", "type": "uint128" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [], "name": "void", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "authority", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "anonymous": true, "inputs": [{ "indexed": true, "name": "sig", "type": "bytes4" }, { "indexed": true, "name": "guy", "type": "address" }, { "indexed": true, "name": "foo", "type": "bytes32" }, { "indexed": true, "name": "bar", "type": "bytes32" }, { "indexed": false, "name": "wad", "type": "uint256" }, { "indexed": false, "name": "fax", "type": "bytes" }], "name": "LogNote", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "name": "authority", "type": "address" }], "name": "LogSetAuthority", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "name": "owner", "type": "address" }], "name": "LogSetOwner", "type": "event" }];
 var abiMedianizer = [{ "constant": false, "inputs": [{ "name": "owner_", "type": "address" }], "name": "setOwner", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "", "type": "bytes32" }], "name": "poke", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [], "name": "poke", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "compute", "outputs": [{ "name": "", "type": "bytes32" }, { "name": "", "type": "bool" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "wat", "type": "address" }], "name": "set", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "wat", "type": "address" }], "name": "unset", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [{ "name": "", "type": "address" }], "name": "indexes", "outputs": [{ "name": "", "type": "bytes12" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "next", "outputs": [{ "name": "", "type": "bytes12" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "read", "outputs": [{ "name": "", "type": "bytes32" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "peek", "outputs": [{ "name": "", "type": "bytes32" }, { "name": "", "type": "bool" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [{ "name": "", "type": "bytes12" }], "name": "values", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "min_", "type": "uint96" }], "name": "setMin", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "authority_", "type": "address" }], "name": "setAuthority", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [], "name": "void", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "pos", "type": "bytes12" }, { "name": "wat", "type": "address" }], "name": "set", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "authority", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "pos", "type": "bytes12" }], "name": "unset", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "next_", "type": "bytes12" }], "name": "setNext", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "min", "outputs": [{ "name": "", "type": "uint96" }], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [{ "indexed": false, "name": "val", "type": "bytes32" }], "name": "LogValue", "type": "event" }, { "anonymous": true, "inputs": [{ "indexed": true, "name": "sig", "type": "bytes4" }, { "indexed": true, "name": "guy", "type": "address" }, { "indexed": true, "name": "foo", "type": "bytes32" }, { "indexed": true, "name": "bar", "type": "bytes32" }, { "indexed": false, "name": "wad", "type": "uint256" }, { "indexed": false, "name": "fax", "type": "bytes" }], "name": "LogNote", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "name": "authority", "type": "address" }], "name": "LogSetAuthority", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "name": "owner", "type": "address" }], "name": "LogSetOwner", "type": "event" }];
 
-var medianizer = '0x729d19f657bd0614b4985cf1d82531c67569197b';
+var medAddress = '0x729d19f657bd0614b4985cf1d82531c67569197b';
 
-var contract = web3.eth.contract(abiMedianizer);
-var med = contract.at(medianizer);
+var med = new web3.eth.Contract(abiMedianizer, medAddress);
 
-var c1 = web3.eth.contract(abiCache);
+var cache = new web3.eth.Contract(abiCache);
 
 var count = 0;
 
@@ -92,16 +91,16 @@ module.exports = (robot) => {
 
   var interval = null;
 
-  med.LogNote({}, (e, r) => {
-    if (!e && ECHO_PRICE) {
-      med.read((e, r) => {
-        if (!e) {
-          var val = web3.fromWei(r);
-          robot.messageRoom('feeds-test', val);
-        }
-      });
-    }
-  });
+  // med.LogNote({}, (e, r) => {
+  //   if (!e && ECHO_PRICE) {
+  //     med.read((e, r) => {
+  //       if (!e) {
+  //         var val = web3.fromWei(r);
+  //         robot.messageRoom('feeds-test', val);
+  //       }
+  //     });
+  //   }
+  // });
 
   // setInterval(() => {
   //   c.peek((e, r) => {
@@ -116,15 +115,11 @@ module.exports = (robot) => {
 
   robot.respond(/status/, res => {
     data.forEach(x => {
-      var c = c1.at(x.cache);
-        c.peek((e, r) => {
-          if (!e) {
-            var val = web3.fromWei(r[0]);
-            res.send(`Feed ${x.cache} Owner ${x.user} Price ${val} ${r[1] ? 'Valid' : 'INVALID'}`);
-          } else {
-            res.reply(e);
-          }
-        });
+      cache.options.address = x.cache;
+      cache.methods.peek().call().then(r => {
+        var val = web3.utils.fromWei(r[0]);
+        res.send(`Feed ${x.cache} Owner ${x.user} Price ${val} ${r[1] ? 'Valid' : 'INVALID'}`);
+      });
     });
   });
 
@@ -135,13 +130,9 @@ module.exports = (robot) => {
   });
 
   robot.respond(/price/, res => {
-    med.read((e, r) => {
-      if (!e) {
-        var val = web3.fromWei(r);
-        res.reply(val);
-      } else {
-        res.reply(e);
-      }
+    med.methods.read().call().then(r => {
+      var val = web3.utils.fromWei(r);
+      res.reply(val);
     });
   });
 
@@ -185,16 +176,14 @@ const createContract = (web3, abi, address) => {
 };
 
 const getBalance = (res, web3, address) => {
-  if (web3.isAddress(address)) {
-    web3.eth.getBalance(address, (error, result) => {
-      if (!error) {
-        res.reply(`${web3.fromWei(result)} ETH`);
-      } else {
-        res.reply('Error getting balance.');
-      }
+  if (web3.utils.isAddress(address)) {
+    web3.eth.getBalance(address).then(balance => {
+      res.reply(`${web3.utils.fromWei(balance)} ETH`);
+    }).catch(error => {
+      res.reply(error);
     });
   } else {
-    res.reply('Incorrect address.');
+    res.reply('Incorrect address format.');
   }
 };
 

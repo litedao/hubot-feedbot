@@ -2,7 +2,7 @@
 
 A hubot script that does the things
 
-See [`src/feedbot.coffee`](src/feedbot.coffee) for full documentation.
+See [`src/feedbot.js`](src/feedbot.js) for full documentation.
 
 ## Installation
 
