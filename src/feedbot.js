@@ -8,8 +8,7 @@
 //   hubot about - bot info
 //   hubot balance <address> - show balance of <address> in ETH
 //   hubot price - show current medianizer price
-//   hubot status - display status of all feeds
-//   hubot toggle - turn price change alerts on/off
+//   hubot details - show details of all feeds
 //
 // Notes:
 //   <optional notes required for the script>
@@ -53,6 +52,11 @@ const data = [
     owner: '0x00Cf06734732A2749f0b77dbA315Aad3A99906a0',
     user: 'equivrel',
   },
+  {
+    cache: '0x0C6503151Ac3fab1229131b9Fb79d658ea6E6Bc0',
+    owner: '0xA8EB82456ed9bAE55841529888cDE9152468635A',
+    user: 'kennyrowe',
+  },
 ];
 
 var Web3 = require('web3');
@@ -73,30 +77,66 @@ var ECHO_PRICE = false;
 
 module.exports = (robot) => {
 
-  // robot.respond(/set (\w+) (.*)/i, res => {
-  //   const key = res.match[1].trim().toLowerCase();
-  //   const value = res.match[2].trim().toLowerCase();
-  //   robot.brain.set(key, value);
-  // });
-
-  // robot.respond(/get (\w+)/i, res => {
-  //   const key = res.match[1].trim().toLowerCase();
-  //   res.reply(robot.brain.get(key) || 'ERROR! No value for that key.');
-  // });
-
-  robot.respond(/who/i, res => {
-    console.log(res.message);
-    console.log(robot.name);
+  robot.respond(/about/, res => {
+    res.send(`"What is my purpose?" "You read feeds." "...Oh my god."
+    Send suggestions to \`mariano.conti\`
+    https://github.com/makerdao/hubot-feedbot`);
   });
 
-  var interval = null;
+  robot.respond(/balance(?:\s+(.*))?$/i, res => {
+    if (res.match[1]) {
+      const address = res.match[1].trim();
+      getBalance(res, web3, address);
+    } else {
+      res.reply('HINT: try `feedbot balance <address>`');
+    }
+  });
+
+  robot.respond(/price/i, res => {
+    med.methods.read().call().then(r => {
+      const val = web3.utils.fromWei(r);
+      res.send(`${val} ETH/USD`);
+    });
+  });
+
+  robot.respond(/(details|status|info)/i, res => {
+    const p = [];
+    data.forEach(x => {
+      cache.options.address = x.cache;
+      p.push(cache.methods.peek().call());
+    });
+    const response = [];
+    Promise.all(p).then(r => {
+      for (let i = 0; i < data.length; i++) {
+        const value = web3.utils.fromWei(r[i][0]);
+        const valid = r[i][1] ? ':white_check_mark:' : ':negative_squared_cross_mark:';
+        response.push(`${valid} ${data[i].cache} Owner ${data[i].user} Price ${value}`);
+      }
+      res.send(response.join("\n"));
+    })
+  });
+
+  robot.respond(/balances/i, res => {
+    const p = [];
+    data.forEach(x => {
+      p.push(web3.eth.getBalance(x.owner));
+    });
+    Promise.all(p).then(r => {
+      const response = [];
+      r.forEach(x => {
+        const balance = web3.utils.fromWei(x);
+        response.push(`${balance} ETH`);
+      });
+      res.send(response.join("\n"));
+    });
+  });
 
   // med.LogNote({}, (e, r) => {
-  //   if (!e && ECHO_PRICE) {
-  //     med.read((e, r) => {
-  //       if (!e) {
-  //         var val = web3.fromWei(r);
-  //         robot.messageRoom('feeds-test', val);
+    //   if (!e && ECHO_PRICE) {
+      //     med.read((e, r) => {
+        //       if (!e) {
+          //         var val = web3.fromWei(r);
+          //         robot.messageRoom('feeds-test', val);
   //       }
   //     });
   //   }
@@ -113,50 +153,18 @@ module.exports = (robot) => {
   //   });
   // }, 60000);
 
-  robot.respond(/status/, res => {
-    data.forEach(x => {
-      cache.options.address = x.cache;
-      cache.methods.peek().call().then(r => {
-        var val = web3.utils.fromWei(r[0]);
-        res.send(`Feed ${x.cache} Owner ${x.user} Price ${val} ${r[1] ? 'Valid' : 'INVALID'}`);
-      });
-    });
-  });
 
-  robot.hear(/test/, res => {
-    var user = { user: { name: 'mariano.conti' } };
-    robot.adapter.sendDirect(user, 'zomg!');
-    // robot.messageRoom(user, 'zomg');
-  });
+  // robot.hear(/test/, res => {
+  //   var user = { user: { name: 'mariano.conti' } };
+  //   robot.adapter.sendDirect(user, 'zomg!');
+  //   // robot.messageRoom(user, 'zomg');
+  // });
 
-  robot.respond(/price/, res => {
-    med.methods.read().call().then(r => {
-      var val = web3.utils.fromWei(r);
-      res.reply(val);
-    });
-  });
 
   robot.respond(/read (.*)/i, res => {
     read(c, res.match[1]).then(r => res.reply(r));
   });
 
-  robot.respond(/about/, res => {
-    res.send("I read feeds.\nSend suggestions to `mariano.conti`\nhttps://github.com/nanexcool/hubot-feedbot");
-  });
-
-  // robot.respond(/status/, res => {
-  //   count++;
-  //   res.send(`${res.random(random)}. (${count})`);
-  // });
-
-  robot.respond(/balance(?:\s+(.*))?$/i, res => {
-    if (res.match[1]) {
-      const address = res.match[1].trim();
-      getBalance(res, web3, address);
-    } else {
-      res.reply('HINT: try `feedbot balance <address>`');
-    }
-  });
 
   robot.respond(/toggle/i, res => {
     ECHO_PRICE = !ECHO_PRICE;
