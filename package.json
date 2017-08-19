@@ -15,7 +15,7 @@
     "url": "https://github.com/hubot-scripts/hubot-feedbot/issues"
   },
   "dependencies": {
-    "web3": "^1.0.0-beta.18"
+    "web3": "^0.20.1"
   },
   "peerDependencies": {
     "hubot": "2.x"
