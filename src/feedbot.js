@@ -15,51 +15,20 @@
 // Author:
 //   Mariano Conti <nanexcool@gmail.com>
 
-const data = [
-  {
-    cache: '0x82e727D640826cFbE0364d52481d79d6821FA39b',
-    owner: '0x00DaA9a2D88BEd5a29A6ca93e0B7d860cd1d403F',
-    user: 'mariano.conti',
-  },
-  {
-    cache: '0xf12a2E2a1a1D714D6C7dB114806411596A09B10a',
-    owner: '0x5E90E067242363bE0b4004E1a60b1D877D3D5877',
-    user: 'mariano.conti',
-  },
-  {
-    cache: '0xf3C13bB0A3E6Af67ba538a4B050496d90D5d6b24',
-    owner: '0xd0148Dad63F73CE6f1B6c607e3413dCF1Ff5f030',
-    user: 'mariano.conti',
-  },
-  {
-    cache: '0x0E565764FEbDf7BCAfc5aB4223a09aBBA4F9345A',
-    owner: '0x238a3f4c923b75f3ef8ca3473a503073f0530801',
-    user: 'james',
-  },
-  {
-    cache: '0x16928e240Ca91DC09053B20d2b909cc29F31bf54',
-    owner: '0x326bde1246c0e42d9983868665b961bca8e647f1',
-    user: 'james',
-  },
-  {
-    cache: '0x975d88b5998b73b3ecf69a5ca6b196dafdb95530',
-    owner: '0xb8bb9ef0a74651d141e798856a2575e7e577e9d7',
-    user: 'james',
-  },
-  {
-    cache: '0x4817856c38c3279fa561e28Af76Fd1743F2aD73b',
-    owner: '0x00Cf06734732A2749f0b77dbA315Aad3A99906a0',
-    user: 'equivrel',
-  },
-  {
-    cache: '0x0C6503151Ac3fab1229131b9Fb79d658ea6E6Bc0',
-    owner: '0xA8EB82456ed9bAE55841529888cDE9152468635A',
-    user: 'kennyrowe',
-  },
-];
+const moment = require('moment');
+const Web3 = require('web3');
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
-var Web3 = require('web3');
-var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+const EXPIRATION_CHECK_INTERVAL = 1000 * 60 * 30; // milliseconds
+const EXPIRATION_ALERT_THRESHOLD = 60 * 30; //seconds
+const BALANCE_ALERT_THERSHOLD = 0.1;
+const BALANCE_CHECK_INTERVAL = 1000 * 60 * 30;
+const ECHO_PRICE = false;
+
+const data = require('./data/feeds.json');
+
+const alerts = {};
+
 
 var abiCache = [{ "constant": false, "inputs": [{ "name": "owner_", "type": "address" }], "name": "setOwner", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "wut", "type": "bytes32" }], "name": "poke", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "read", "outputs": [{ "name": "", "type": "bytes32" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "peek", "outputs": [{ "name": "", "type": "bytes32" }, { "name": "", "type": "bool" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "authority_", "type": "address" }], "name": "setAuthority", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "wut", "type": "bytes32" }, { "name": "Zzz", "type": "uint128" }], "name": "prod", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "zzz", "outputs": [{ "name": "", "type": "uint128" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [], "name": "void", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "authority", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "anonymous": true, "inputs": [{ "indexed": true, "name": "sig", "type": "bytes4" }, { "indexed": true, "name": "guy", "type": "address" }, { "indexed": true, "name": "foo", "type": "bytes32" }, { "indexed": true, "name": "bar", "type": "bytes32" }, { "indexed": false, "name": "wad", "type": "uint256" }, { "indexed": false, "name": "fax", "type": "bytes" }], "name": "LogNote", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "name": "authority", "type": "address" }], "name": "LogSetAuthority", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "name": "owner", "type": "address" }], "name": "LogSetOwner", "type": "event" }];
 var abiMedianizer = [{ "constant": false, "inputs": [{ "name": "owner_", "type": "address" }], "name": "setOwner", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "", "type": "bytes32" }], "name": "poke", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [], "name": "poke", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "compute", "outputs": [{ "name": "", "type": "bytes32" }, { "name": "", "type": "bool" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "wat", "type": "address" }], "name": "set", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "wat", "type": "address" }], "name": "unset", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [{ "name": "", "type": "address" }], "name": "indexes", "outputs": [{ "name": "", "type": "bytes12" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "next", "outputs": [{ "name": "", "type": "bytes12" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "read", "outputs": [{ "name": "", "type": "bytes32" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "peek", "outputs": [{ "name": "", "type": "bytes32" }, { "name": "", "type": "bool" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [{ "name": "", "type": "bytes12" }], "name": "values", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "min_", "type": "uint96" }], "name": "setMin", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "authority_", "type": "address" }], "name": "setAuthority", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [], "name": "void", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "pos", "type": "bytes12" }, { "name": "wat", "type": "address" }], "name": "set", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "authority", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "pos", "type": "bytes12" }], "name": "unset", "outputs": [], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "next_", "type": "bytes12" }], "name": "setNext", "outputs": [], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "min", "outputs": [{ "name": "", "type": "uint96" }], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [{ "indexed": false, "name": "val", "type": "bytes32" }], "name": "LogValue", "type": "event" }, { "anonymous": true, "inputs": [{ "indexed": true, "name": "sig", "type": "bytes4" }, { "indexed": true, "name": "guy", "type": "address" }, { "indexed": true, "name": "foo", "type": "bytes32" }, { "indexed": true, "name": "bar", "type": "bytes32" }, { "indexed": false, "name": "wad", "type": "uint256" }, { "indexed": false, "name": "fax", "type": "bytes" }], "name": "LogNote", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "name": "authority", "type": "address" }], "name": "LogSetAuthority", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "name": "owner", "type": "address" }], "name": "LogSetOwner", "type": "event" }];
@@ -70,9 +39,12 @@ var med = web3.eth.contract(abiMedianizer).at(medAddress);
 
 var cache = web3.eth.contract(abiCache);
 
-var count = 0;
+const toEtherscan = (address) => `https://etherscan.io/address/${address}`
 
-var ECHO_PRICE = false;
+const randomError = [
+  'Oops, something went wrong! @mariano.conti get on it quick!',
+  'There\'s been an error. Paging @mariano.conti'
+]
 
 module.exports = (robot) => {
 
@@ -85,19 +57,20 @@ module.exports = (robot) => {
   robot.respond(/balance(?:\s+(.*))?$/i, res => {
     if (res.match[1]) {
       const address = res.match[1].trim();
-      getBalance(res, web3, address);
+      getBalance(address)
+        .then(balance => res.reply(`${web3.fromWei(balance)} ETH`))
+        .catch(error => res.reply(`${error}`));
     } else {
       res.reply('HINT: try `feedbot balance <address>`');
     }
   });
 
   robot.respond(/price/i, res => {
-    med.read((error, r) => {
+    med.read((error, price) => {
       if (!error) {
-        const val = web3.fromWei(r);
-        res.send(`${val} ETH/USD`);
+        res.reply(`${web3.fromWei(price)} ETH/USD`);
       } else {
-        res.send('Something went wrong!');
+        res.reply(res.random(randomError));
       }
     });
   });
@@ -123,24 +96,23 @@ module.exports = (robot) => {
   robot.respond(/balances/i, res => {
     const p = [];
     data.forEach(x => {
-      p.push(web3.eth.getBalance(x.owner));
+      p.push(getBalance(x.owner));
     });
     Promise.all(p).then(r => {
       const response = [];
-      r.forEach(x => {
-        const balance = web3.utils.fromWei(x);
-        response.push(`${balance} ETH`);
+      r.forEach(balance => {
+        response.push(`${web3.fromWei(balance)} ETH`);
       });
       res.send(response.join("\n"));
     });
   });
 
   // med.LogNote({}, (e, r) => {
-    //   if (!e && ECHO_PRICE) {
-      //     med.read((e, r) => {
-        //       if (!e) {
-          //         var val = web3.fromWei(r);
-          //         robot.messageRoom('feeds-test', val);
+  //   if (!e && ECHO_PRICE) {
+  //     med.read((e, r) => {
+  //       if (!e) {
+  //         var val = web3.fromWei(r);
+  //         robot.messageRoom('feeds-test', val);
   //       }
   //     });
   //   }
@@ -175,28 +147,13 @@ module.exports = (robot) => {
     const out = ECHO_PRICE ? 'on' : 'off';
     res.reply(`Price alerts are now ${out}.`);
   });
+
+  checkExpirations(robot);
+  checkBalances(robot);
+
+  setInterval(() => checkExpirations(robot), EXPIRATION_CHECK_INTERVAL);
+  setInterval(() => checkBalances(robot), BALANCE_CHECK_INTERVAL);
 }
-
-const random = [
-  "zomg",
-  "this is not normal",
-  "whatever",
-  "ermagherd"
-];
-
-const getBalance = (res, web3, address) => {
-  if (web3.isAddress(address)) {
-    web3.eth.getBalance(address, (error, balance) => {
-      if (!error) {
-        res.reply(`${web3.fromWei(balance)} ETH`);
-      } else {
-        res.reply('Something went wrong!');
-      }
-    });
-  } else {
-    res.reply('Incorrect address format.');
-  }
-};
 
 const read = (contract, method) => {
   return new Promise((resolve, reject) => {
@@ -209,3 +166,58 @@ const read = (contract, method) => {
     });
   });
 }
+
+const getBalance = (address) => {
+  return new Promise((resolve, reject) => {
+    web3.eth.getBalance(address, (error, result) => {
+      error ? reject(error) : resolve(result);
+    })
+  });
+}
+
+// getBalance('0x00Cf06734732A2749f0b77dbA315Aad3A99906a0').then(console.log)
+
+const checkExpirations = (robot) => {
+
+  data.forEach(feed => {
+    read(web3.eth.contract(abiCache).at(feed.cache), 'zzz')
+      .then(result => {
+        const expiration = web3.toDecimal(result);
+        const now = Math.floor(Date.now() / 1000);
+        const diff = expiration - now;
+        if (diff <= 0) {
+          // expired
+        } else if (diff < EXPIRATION_ALERT_THRESHOLD) {
+          if (!alerts[feed.cache]) {
+            const formatted = moment.duration(diff, 'seconds').humanize(true);
+            const output = `Heads up! Feed ${toEtherscan(feed.cache)} expires ${formatted}`;
+            var user = { user: { name: 'mariano.conti' } };
+            robot.adapter.sendDirect(user, output);
+            alerts[feed.cache] = true;
+          }
+        } else {
+          alerts[feed.cache] = false;
+        }
+      })
+  });
+}
+
+const checkBalances = (robot) => {
+  data.forEach(feed => {
+    getBalance(feed.owner)
+      .then(balance => {
+        if (web3.fromWei(balance) < BALANCE_ALERT_THERSHOLD) {
+          if (!alerts[feed.owner]) {
+            const output = `Heads up! Balance for your account ${toEtherscan(feed.owner)} is running low`;
+            var user = { user: { name: 'mariano.conti' } };
+            robot.adapter.sendDirect(user, output);
+            alerts[feed.owner] = true;
+          }
+        } else {
+          alerts[feed.owner] = false;
+        }
+      })
+      .catch(error => console.log(`${error}`));
+  });
+}
+
