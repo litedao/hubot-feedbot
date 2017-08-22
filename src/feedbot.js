@@ -191,7 +191,7 @@ const checkExpirations = (robot) => {
           if (!alerts[feed.cache]) {
             const formatted = moment.duration(diff, 'seconds').humanize(true);
             const output = `Heads up! Feed ${toEtherscan(feed.cache)} expires ${formatted}`;
-            var user = { user: { name: 'mariano.conti' } };
+            var user = { user: { name: feed.user } };
             robot.adapter.sendDirect(user, output);
             alerts[feed.cache] = true;
           }
@@ -209,7 +209,7 @@ const checkBalances = (robot) => {
         if (web3.fromWei(balance) < BALANCE_ALERT_THERSHOLD) {
           if (!alerts[feed.owner]) {
             const output = `Heads up! Balance for your account ${toEtherscan(feed.owner)} is running low`;
-            var user = { user: { name: 'mariano.conti' } };
+            var user = { user: { name: feed.user } };
             robot.adapter.sendDirect(user, output);
             alerts[feed.owner] = true;
           }
